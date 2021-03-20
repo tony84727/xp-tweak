@@ -1,5 +1,3 @@
-import com.sun.org.apache.xerces.internal.xinclude.XInclude11TextReader
-
 buildscript {
     repositories {
         jcenter()
@@ -17,7 +15,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.0'
+version = "1.0-${System.env.BUILD ? System.env.BUILD : 'dev'}"
 group = 'com.github.tony84727' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'xptweak'
 
@@ -128,14 +126,13 @@ dependencies {
 
 // Example for how to get properties into the manifest for reading by the runtime..
 jar {
-    classifier = "1.16"
     manifest {
         attributes([
             "Specification-Title": "xptech",
             "Specification-Vendor": "tony84727",
             "Specification-Version": "1", // We are version 1 of ourselves
             "Implementation-Title": project.name,
-            "Implementation-Version": "${version}",
+            "Implementation-Version": "${archiveVersion}",
             "Implementation-Vendor" :"examplemodsareus",
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
@@ -149,7 +146,7 @@ repositories {
 
 shadowJar {
     configurations = [project.configurations.shadow]
-    classifier = "1.16"
+    archiveClassifier.set('')
     relocate 'io.netty', 'xptweak.io.netty'
 }
 
