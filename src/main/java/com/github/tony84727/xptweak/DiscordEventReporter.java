@@ -25,6 +25,6 @@ public class DiscordEventReporter {
     }
 
     private static String formatMinecraftChat(ServerChatEvent event) {
-        return String.format("%s 說： %s", event.getUsername(), event.getMessage());
+        return String.format("%s說：%s", event.getUsername(), event.getMessage());
     }
 }

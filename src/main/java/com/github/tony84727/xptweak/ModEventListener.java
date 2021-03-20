@@ -25,7 +25,7 @@ public class ModEventListener {
         if (event.getConfig().getSpec() != CONFIG_SPEC) {
             return;
         }
-        LOGGER.info("mod configured");
+        LOGGER.info("bot configured");
         if (listener != null) {
             MinecraftForge.EVENT_BUS.unregister(listener);
             listener = null;

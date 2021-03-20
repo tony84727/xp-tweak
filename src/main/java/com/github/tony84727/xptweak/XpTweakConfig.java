@@ -8,9 +8,11 @@ public class XpTweakConfig {
     public ForgeConfigSpec.ConfigValue<Long> channelID;
 
     public XpTweakConfig(ForgeConfigSpec.Builder builder) {
+        builder.push("discord");
         botToken = builder.comment("Discord bot token. It's secret, do not share with others")
             .define("botToken", "yourDiscordBotTokenHere");
         channelID = builder.comment("Discord bot channel").define("channelID",  0L);
+        builder.pop();
     }
 
     public DiscordClient getDiscordClient() {
