@@ -31,9 +31,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Build with Gradle
+        env:
+          BUILD: github.run_number
         run: ./gradlew build
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
           name: xptweak
-          path: build/libs/xptweak-1.0-1.16.jar
+          path: build/libs/xptweak-1.0-${{github.run_number}}.jar
