@@ -1,5 +1,6 @@
 package com.github.tony84727.xptweak;
 
+import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -16,10 +17,12 @@ public class ServerEventListener {
 
     private final DiscordEventReporter discordReporter;
     private final Flux<MessageCreateEvent> messages;
+    private final Snowflake targetChannel;
 
-    public ServerEventListener(DiscordEventReporter reporter, Flux<MessageCreateEvent> messages) {
+    public ServerEventListener(DiscordEventReporter reporter, Flux<MessageCreateEvent> messages, Snowflake targetChannel) {
         this.discordReporter = reporter;
         this.messages = messages;
+        this.targetChannel = targetChannel;
     }
 
     @SubscribeEvent
@@ -36,7 +39,9 @@ public class ServerEventListener {
     public void onServerStarted(FMLServerStartedEvent event) {
         this.discordReporter.annouceEvent("伺服器已啟動！");
         final ServerEventReporter serverReporter = new ServerEventReporter(event.getServer());
-        this.messages.filter(event1 -> event1.getMember().map(member -> !member.isBot()).orElse(false)
+        this.messages.filter(event1 ->
+                event1.getMessage().getChannelId().equals(this.targetChannel) &&
+                        event1.getMember().map(member -> !member.isBot()).orElse(false)
         ).subscribe(serverReporter::sendChat);
     }
 

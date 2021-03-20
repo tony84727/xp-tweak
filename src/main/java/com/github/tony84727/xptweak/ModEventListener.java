@@ -46,7 +46,7 @@ public class ModEventListener {
             return;
         }
         DiscordEventReporter discordEventReporter = new DiscordEventReporter(restChannel);
-        listener = new ServerEventListener(discordEventReporter, gateway.on(MessageCreateEvent.class));
+        listener = new ServerEventListener(discordEventReporter, gateway.on(MessageCreateEvent.class), Snowflake.of(CONFIG.channelID.get()));
         MinecraftForge.EVENT_BUS.register(listener);
     }
 }
