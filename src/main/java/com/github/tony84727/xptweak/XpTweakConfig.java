@@ -4,8 +4,8 @@ import discord4j.core.DiscordClient;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 public class XpTweakConfig {
-    private ForgeConfigSpec.ConfigValue<String> botToken;
-    public ForgeConfigSpec.ConfigValue<Long> channelID;
+    private final ForgeConfigSpec.ConfigValue<String> botToken;
+    public final ForgeConfigSpec.ConfigValue<Long> channelID;
 
     public XpTweakConfig(ForgeConfigSpec.Builder builder) {
         builder.push("discord");
