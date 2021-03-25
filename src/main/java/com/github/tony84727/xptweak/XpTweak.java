@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.network.FMLNetworkConstants;
 import org.apache.commons.lang3.tuple.Pair;
+import reactor.core.publisher.MonoProcessor;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(XpTweak.MOD_ID)
@@ -16,6 +17,7 @@ public class XpTweak {
     // Directly reference a log4j logger.
     public static final XpTweakConfig CONFIG;
     public static final ForgeConfigSpec CONFIG_SPEC;
+    public static final MonoProcessor<ServerEventListeners> listenersMono = MonoProcessor.create();
 
     static {
         final Pair<XpTweakConfig, ForgeConfigSpec> configPair = new ForgeConfigSpec.Builder().configure(XpTweakConfig::new);
@@ -28,5 +30,15 @@ public class XpTweak {
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, CONFIG_SPEC);
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
+    }
+
+    private static ServerEventListeners spawnServerEventListeners() {
+        final ServerEventListeners listeners = new ServerEventListeners();
+        listeners.attach();
+        return listeners;
+    }
+
+    private void publishServerListeners() {
+        listenersMono.onNext(spawnServerEventListeners());
     }
 }
