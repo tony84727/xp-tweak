@@ -37,8 +37,4 @@ public class XpTweak {
         listeners.attach();
         return listeners;
     }
-
-    private void publishServerListeners() {
-        listenersMono.onNext(spawnServerEventListeners());
-    }
 }

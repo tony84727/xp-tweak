@@ -6,11 +6,13 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import discord4j.discordjson.json.MessageData;
 import discord4j.rest.entity.RestChannel;
+import net.minecraft.advancements.DisplayInfo;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.player.AdvancementEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
@@ -56,6 +58,7 @@ public class DiscordRelay {
             }
             return entity.getType().equals(EntityType.PLAYER);
         });
+        final Flux<AdvancementEvent> advancementEventFlux = listenerFlux.flatMapMany(ServerEventListeners::getAdvancementEventProcessor);
 
         final UUID discordSenderID = UUID.randomUUID();
         final Flux<String> discordTextMessage = Flux.merge(
@@ -65,7 +68,14 @@ public class DiscordRelay {
                 stoppedEventFlux.map(fmlServerStoppedEvent -> "伺服器已停機！"),
                 playerLoggedInFlux.map(DiscordMessageDisplayFormatter::formatLoggedIn),
                 playerLoggedOutFlux.map(DiscordMessageDisplayFormatter::formatLoggedOut),
-                playerDeathFlux.map(livingDeathEvent -> livingDeathEvent.getSource().getDeathMessage(livingDeathEvent.getEntityLiving()).getString()));
+                playerDeathFlux.map(livingDeathEvent -> livingDeathEvent.getSource().getDeathMessage(livingDeathEvent.getEntityLiving()).getString()),
+                advancementEventFlux.filter(event -> {
+                    final DisplayInfo displayInfo = event.getAdvancement().getDisplay();
+                    if (displayInfo == null) {
+                        return false;
+                    }
+                    return displayInfo.shouldAnnounceToChat();
+                }).map(DiscordMessageDisplayFormatter::formatAdvancement));
         final Flux<MessageData> discordMessageFlux = discordTextMessage.withLatestFrom(restChannel, Pair::of).flatMap(
                 (pair) -> {
                     final String message = pair.getLeft();
