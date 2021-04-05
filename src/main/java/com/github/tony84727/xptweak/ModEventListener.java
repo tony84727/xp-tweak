@@ -21,11 +21,11 @@ public class ModEventListener {
     private static final ReplayProcessor<DiscordClient> discordClientFlux = ReplayProcessor.create(1);
     private static final Flux<GatewayDiscordClient> gatewayFlux = discordClientFlux.switchMap(discordClient -> discordClient.gateway().login());
     private static final ReplayProcessor<Snowflake> targetChannelFlux = ReplayProcessor.create(1);
-    private static final Mono<ServerEventListeners> listenerMono = Mono.defer(() -> Mono.create(serverEventListenersMonoSink -> {
+    private static final Mono<ServerEventListeners> listenerMono = Mono.create(serverEventListenersMonoSink -> {
         final ServerEventListeners listeners = new ServerEventListeners();
         listeners.attach();
         serverEventListenersMonoSink.success(listeners);
-    }));
+    });
 
     static {
         DiscordRelay.start(gatewayFlux, targetChannelFlux.distinct(), listenerMono);
