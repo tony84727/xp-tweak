@@ -113,7 +113,7 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 configurations {
     shadow
-    compile.extendsFrom(shadow)
+    implementation.extendsFrom(shadow)
 }
 
 dependencies {
@@ -121,6 +121,7 @@ dependencies {
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft 'net.minecraftforge:forge:1.16.5-36.0.46'
+    implementation 'io.netty:netty-handler:4.1.54.Final'
     shadow 'com.discord4j:discord4j-core:3.1.3'
 }
 
