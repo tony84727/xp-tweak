@@ -46,8 +46,8 @@ public class DiscordRelay {
         final Flux<ServerChatEvent> chatEvent = listenerFlux.flatMapMany(ServerEventListeners::getServerChantEventProcessor);
 
         final Flux<FMLServerStartedEvent> startedEventFlux = listenerFlux.flatMapMany(ServerEventListeners::getServerStartedEventProcessor);
-        final Flux<FMLServerStartingEvent> startingEventFlux = listenerFlux.flatMapMany(ServerEventListeners::getServerStartingEventEmitterProcessor);
-        final Flux<FMLServerStoppedEvent> stoppedEventFlux = listenerFlux.flatMapMany(ServerEventListeners::getServerStoppedEventEmitterProcessor);
+        final Flux<FMLServerStartingEvent> startingEventFlux = listenerFlux.flatMapMany(ServerEventListeners::getServerStartingEventProcessor);
+        final Flux<FMLServerStoppedEvent> stoppedEventFlux = listenerFlux.flatMapMany(ServerEventListeners::getServerStoppedEventProcessor);
 
         final Flux<PlayerEvent.PlayerLoggedInEvent> playerLoggedInFlux = listenerFlux.flatMapMany(ServerEventListeners::getPlayerLoggedInEventProcessor);
         final Flux<PlayerEvent.PlayerLoggedOutEvent> playerLoggedOutFlux = listenerFlux.flatMapMany(ServerEventListeners::getPlayerLoggedOutEventProcessor);

@@ -9,48 +9,48 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
-import reactor.core.publisher.EmitterProcessor;
+import reactor.extra.processor.TopicProcessor;
 
 public class ServerEventListeners {
-    private final EmitterProcessor<PlayerEvent.PlayerLoggedInEvent> playerLoggedInEventProcessor = EmitterProcessor.create();
-    private final EmitterProcessor<PlayerEvent.PlayerLoggedOutEvent> playerLoggedOutEventProcessor = EmitterProcessor.create();
-    private final EmitterProcessor<LivingDeathEvent> livingDeathEventProcessor = EmitterProcessor.create();
-    private final EmitterProcessor<AdvancementEvent> advancementEventProcessor = EmitterProcessor.create();
-    private final EmitterProcessor<ServerChatEvent> serverChantEventProcessor = EmitterProcessor.create();
-    private final EmitterProcessor<FMLServerStartedEvent> serverStartedEventProcessor = EmitterProcessor.create();
-    private final EmitterProcessor<FMLServerStartingEvent> serverStartingEventEmitterProcessor = EmitterProcessor.create();
-    private final EmitterProcessor<FMLServerStoppedEvent> serverStoppedEventEmitterProcessor = EmitterProcessor.create();
+    private final TopicProcessor<PlayerEvent.PlayerLoggedInEvent> playerLoggedInEventProcessor = TopicProcessor.create();
+    private final TopicProcessor<PlayerEvent.PlayerLoggedOutEvent> playerLoggedOutEventProcessor = TopicProcessor.create();
+    private final TopicProcessor<LivingDeathEvent> livingDeathEventProcessor = TopicProcessor.create();
+    private final TopicProcessor<AdvancementEvent> advancementEventProcessor = TopicProcessor.create();
+    private final TopicProcessor<ServerChatEvent> serverChantEventProcessor = TopicProcessor.create();
+    private final TopicProcessor<FMLServerStartedEvent> serverStartedEventProcessor = TopicProcessor.create();
+    private final TopicProcessor<FMLServerStartingEvent> serverStartingEventProcessor = TopicProcessor.create();
+    private final TopicProcessor<FMLServerStoppedEvent> serverStoppedEventProcessor = TopicProcessor.create();
 
-    public EmitterProcessor<PlayerEvent.PlayerLoggedInEvent> getPlayerLoggedInEventProcessor() {
+    public TopicProcessor<PlayerEvent.PlayerLoggedInEvent> getPlayerLoggedInEventProcessor() {
         return playerLoggedInEventProcessor;
     }
 
-    public EmitterProcessor<PlayerEvent.PlayerLoggedOutEvent> getPlayerLoggedOutEventProcessor() {
+    public TopicProcessor<PlayerEvent.PlayerLoggedOutEvent> getPlayerLoggedOutEventProcessor() {
         return playerLoggedOutEventProcessor;
     }
 
-    public EmitterProcessor<LivingDeathEvent> getLivingDeathEventProcessor() {
+    public TopicProcessor<LivingDeathEvent> getLivingDeathEventProcessor() {
         return livingDeathEventProcessor;
     }
 
-    public EmitterProcessor<AdvancementEvent> getAdvancementEventProcessor() {
+    public TopicProcessor<AdvancementEvent> getAdvancementEventProcessor() {
         return advancementEventProcessor;
     }
 
-    public EmitterProcessor<ServerChatEvent> getServerChantEventProcessor() {
+    public TopicProcessor<ServerChatEvent> getServerChantEventProcessor() {
         return serverChantEventProcessor;
     }
 
-    public EmitterProcessor<FMLServerStartedEvent> getServerStartedEventProcessor() {
+    public TopicProcessor<FMLServerStartedEvent> getServerStartedEventProcessor() {
         return serverStartedEventProcessor;
     }
 
-    public EmitterProcessor<FMLServerStartingEvent> getServerStartingEventEmitterProcessor() {
-        return serverStartingEventEmitterProcessor;
+    public TopicProcessor<FMLServerStartingEvent> getServerStartingEventProcessor() {
+        return serverStartingEventProcessor;
     }
 
-    public EmitterProcessor<FMLServerStoppedEvent> getServerStoppedEventEmitterProcessor() {
-        return serverStoppedEventEmitterProcessor;
+    public TopicProcessor<FMLServerStoppedEvent> getServerStoppedEventProcessor() {
+        return serverStoppedEventProcessor;
     }
 
     public void attach() {
@@ -95,7 +95,7 @@ public class ServerEventListeners {
     @SubscribeEvent
     @SuppressWarnings("unused")
     public void onServerStarting(final FMLServerStartingEvent event) {
-        serverStartingEventEmitterProcessor.onNext(event);
+        serverStartingEventProcessor.onNext(event);
     }
 
     @SubscribeEvent
@@ -107,6 +107,6 @@ public class ServerEventListeners {
     @SubscribeEvent
     @SuppressWarnings("unused")
     public void onServerStopped(final FMLServerStoppedEvent event) {
-        serverStoppedEventEmitterProcessor.onNext(event);
+        serverStoppedEventProcessor.onNext(event);
     }
 }
