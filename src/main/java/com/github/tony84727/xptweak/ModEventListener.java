@@ -28,7 +28,10 @@ public class ModEventListener {
     });
 
     static {
-        DiscordRelay.start(gatewayFlux, targetChannelFlux.distinct(), listenerMono);
+        DiscordRelay.start(
+                gatewayFlux,
+                targetChannelFlux.distinct(),
+                listenerMono);
     }
 
     @SubscribeEvent

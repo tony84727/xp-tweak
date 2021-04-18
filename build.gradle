@@ -123,6 +123,10 @@ dependencies {
     minecraft 'net.minecraftforge:forge:1.16.5-36.0.46'
     implementation 'io.netty:netty-handler:4.1.54.Final'
     shadow 'com.discord4j:discord4j-core:3.1.5'
+    compileOnly fg.deobf('com.feed_the_beast.mods:ftb-backups:2.1.1.6')
+    runtimeOnly fg.deobf('com.feed_the_beast.mods:ftb-backups:2.1.1.6')
+    testImplementation(platform('org.junit:junit-bom:5.7.1'))
+    testImplementation('org.junit.jupiter:junit-jupiter')
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
@@ -143,6 +147,9 @@ jar {
 repositories {
     mavenCentral()
     jcenter()
+    maven {
+        url = "https://maven.latmod.com"
+    }
 }
 
 shadowJar {
@@ -156,4 +163,8 @@ reobf {
         dependsOn tasks.createMcpToSrg
         mappings = tasks.createMcpToSrg.outputs.files.singleFile
     }
+}
+
+test {
+    useJUnitPlatform()
 }
