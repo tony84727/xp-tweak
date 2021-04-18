@@ -1,14 +1,18 @@
 package com.github.tony84727.xptweak;
 
+import com.github.tony84727.xptweak.integration.BackupFinishedEvent;
+import com.github.tony84727.xptweak.integration.BackupStartedEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.AdvancementEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
+import reactor.core.publisher.Flux;
 import reactor.extra.processor.TopicProcessor;
 
 public class ServerEventListeners {
@@ -51,6 +55,32 @@ public class ServerEventListeners {
 
     public TopicProcessor<FMLServerStoppedEvent> getServerStoppedEventProcessor() {
         return serverStoppedEventProcessor;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Flux<BackupStartedEvent> getBackupStartedEventFlux() {
+        if (ModList.get().isLoaded("ftbbackups")) {
+            try {
+                return (Flux<BackupStartedEvent>) Class.forName("com.github.tony84727.xptweak.integration.FTBBackupFlux").getField("preBackupFlux").get(null);
+            } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException | IllegalArgumentException e) {
+                throw new RuntimeException("ftb backup integration mess up", e);
+            }
+        } else {
+            return Flux.empty();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public Flux<BackupFinishedEvent> getBackupFinishedEventFlux() {
+        if (ModList.get().isLoaded("ftbbackups")) {
+            try {
+                return (Flux<BackupFinishedEvent>) Class.forName("com.github.tony84727.xptweak.integration.FTBBackupFlux").getField("postBackupFlux").get(null);
+            } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException | IllegalArgumentException e) {
+                throw new RuntimeException("ftb backup integration mess up", e);
+            }
+        } else {
+            return Flux.empty();
+        }
     }
 
     public void attach() {

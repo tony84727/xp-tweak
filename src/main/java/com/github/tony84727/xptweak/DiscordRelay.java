@@ -1,9 +1,12 @@
 package com.github.tony84727.xptweak;
 
+import com.github.tony84727.xptweak.integration.BackupFinishedEvent;
+import com.github.tony84727.xptweak.integration.BackupStartedEvent;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
+import discord4j.discordjson.json.EmbedData;
 import discord4j.discordjson.json.MessageData;
 import discord4j.rest.entity.RestChannel;
 import net.minecraft.advancements.DisplayInfo;
@@ -23,10 +26,14 @@ import reactor.core.Disposable;
 import reactor.core.Disposables;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.UUID;
 
 public class DiscordRelay {
+    public static Scheduler discordScheduler = Schedulers.newElastic("xptweakdiscord");
+
     public static Disposable start(
             Flux<GatewayDiscordClient> gatewayFlux,
             Flux<Snowflake> targetChannelFlux,
@@ -76,14 +83,23 @@ public class DiscordRelay {
                     }
                     return displayInfo.shouldAnnounceToChat();
                 }).map(DiscordMessageDisplayFormatter::formatAdvancement));
-        final Flux<MessageData> discordMessageFlux = discordTextMessage.withLatestFrom(restChannel, Pair::of).flatMap(
-                (pair) -> {
-                    final String message = pair.getLeft();
-                    final RestChannel channel = pair.getRight();
-                    return channel.createMessage(message);
-                });
+        final Flux<BackupStartedEvent> backupStartedEventFlux = listenerFlux.flatMapMany(ServerEventListeners::getBackupStartedEventFlux);
+        final Flux<BackupFinishedEvent> backupFinishedEventFlux = listenerFlux.flatMapMany(ServerEventListeners::getBackupFinishedEventFlux);
+        final Flux<EmbedData> backupEventMessageFlux = Flux.merge(
+                backupStartedEventFlux.map(DiscordMessageDisplayFormatter::formatBackupStarted),
+                backupFinishedEventFlux.map(DiscordMessageDisplayFormatter::formatBackupFinished)
+        );
+        final Flux<MessageData> embedMessageFlux = backupEventMessageFlux.withLatestFrom(restChannel, ((embedData, channel) ->
+                channel.createMessage(embedData)
+        )).flatMap((messageDataMono -> messageDataMono));
+        final Flux<MessageData> discordMessageFlux = discordTextMessage.withLatestFrom(restChannel, ((message, channel) ->
+                channel.createMessage(message)
+        )).flatMap((messageDataMono -> messageDataMono));
         return Disposables.composite(
-                discordMessageFlux.subscribe(),
+                Flux.merge(
+                        embedMessageFlux,
+                        discordMessageFlux
+                ).subscribeOn(discordScheduler).subscribe(),
                 channelMessage.subscribe(discordMessage -> {
                     final MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
                     if (server == null) {
